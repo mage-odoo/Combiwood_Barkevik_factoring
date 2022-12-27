@@ -1,1 +1,1 @@
-from . import add_partner_contact
+from . import add_partner_contact, settings
