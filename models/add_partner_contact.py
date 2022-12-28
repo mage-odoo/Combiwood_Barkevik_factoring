@@ -18,8 +18,26 @@ class AddSalesOrder(models.Model):
         self.is_factoring = self.partner_id.is_factoring
 
 
+class advance_payment_inv_inherit(models.TransientModel):
+    _inherit = 'sale.advance.payment.inv'
+    is_factoring_temp = fields.Boolean(string='Is Factoring')
+
+    def create_invoices(self):
+        print("done calling.............................")
+        super(advance_payment_inv_inherit, self).create_invoices()
+
+
 class AddAccountMove(models.Model):
     _inherit = "account.move"
     is_factorial_id = fields.Many2one('sale.order')
-    is_factoring = fields.Boolean(store=True,
-                                  related='is_factorial_id.is_factoring')
+    is_factoring = fields.Char(store=True)
+
+
+class ressetting(models.TransientModel):
+    _inherit = "res.config.settings"
+    is_factoring = fields.Boolean(string='Is Factoring', default=1)
+
+
+class bankaccountisfectoring(models.Model):
+    _inherit = "res.partner.bank"
+    is_factoring = fields.Boolean(string='Is Factoring', default=1)
