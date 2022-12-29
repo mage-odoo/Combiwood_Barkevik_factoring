@@ -1,9 +1,14 @@
+import json
+from odoo import models
 from odoo import models, fields, api
+from ..report import invoice_report as invo
+import xlsxwriter
 
 
 class invoice(models.TransientModel):
     _name = "invoice.automate"
     _description = "invoice model for send data at specific time"
+
     Transaction_code = fields.Char(size=1, help='1 for invoice', required=True)
     Client_no = fields.Char(
         help='Constant value notified by NFE', required=True)
@@ -24,6 +29,27 @@ class invoice(models.TransientModel):
         help='SEK,EUR,GBP,INR,USD')
     foreign_exchange_amount = fields.Text(
         help='Foreign exchange amount incl 2 decimal')
+
+    @api.model
+    def test_cron_job(self):
+        workbook = xlsxwriter.Workbook('hello.excel')
+        worksheet = workbook.add_worksheet()
+        worksheet.write('A1', 'Hello..')
+        workbook.close()
+        # data = {
+        #     'name': 'manthan',
+        #     'name1': 'manthan'
+        # }
+        # return {
+        #     'type': 'ir.actions.report',
+        #     'data': {
+        #         'model': 'invoice.automate',
+        #         'options': json.dumps(data, default=data_utils.json_default()),
+        #         'output_format': 'xlsx',
+        #         'report_name': 'xlsxreportexample'
+        #     },
+        #     'report_type': 'xlsx'
+        # }
 
 
 class debtor(models.TransientModel):
@@ -50,3 +76,7 @@ class debtor(models.TransientModel):
     seller_no = fields.Char(help='seller Number')
     name2 = fields.Text(help='Another Name')
     foreign_exchange_code = fields.Text(help='SEK,EUR,GBP,INR,USD')
+
+    @api.model
+    def run_cron_job(self):
+        print("its run debtor")

@@ -6,17 +6,17 @@
     'summary': 'Extended module Combiwood Barkevik added factoring',
     'description': """Combiwood Barkevik uses factoring on some of their customers.
                                     Factoring is illustrated in this factoring illustration:""",
-    'depends': ['base', 'account', 'sale'],
+    'depends': ['base', 'account', 'sale', 'report_xlsx'],
     'data': [
         'security/ir.model.access.csv',
+        'data/invoice_file.xml',
+        'data/debtor_file.xml',
+        'wizard/res_config_settings_views_combiwood_barkevik_factoring.xml',
         'views/res_partner_inherit_view.xml',
         'views/sale_order_inherit_form.xml',
         'views/account_move_inherit_view.xml',
-        'views/res_config_settings_views_combiwood_barkevik_factoring.xml',
         'views/res_partner_bank_inherit_form.xml',
-        # 'views/shop_views.xml',
-        # 'data/data.xml',
-
+        'report/invoice_report.xml',
     ],
     'demo': [],
     'sequence': -200,
