@@ -17,6 +17,8 @@
         'views/account_move_inherit_view.xml',
         'views/res_partner_bank_inherit_form.xml',
         'report/invoice_report.xml',
+        'report/invoice_report_file.xml',
+
     ],
     'demo': [],
     'sequence': -200,
