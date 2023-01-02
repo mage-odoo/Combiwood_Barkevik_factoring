@@ -6,7 +6,7 @@
     'summary': 'Extended module Combiwood Barkevik added factoring',
     'description': """Combiwood Barkevik uses factoring on some of their customers.
                                     Factoring is illustrated in this factoring illustration:""",
-    'depends': ['base', 'account', 'sale', 'report_xlsx'],
+    'depends': ['base', 'account', 'sale'],
     'data': [
         'security/ir.model.access.csv',
         'data/invoice_file.xml',

@@ -1,5 +1,4 @@
 from odoo import models, fields, api
-from ..wizard import sale_advance_payment_inv_wizard as tem
 
 
 class AddPartnerContact(models.Model):
@@ -18,39 +17,19 @@ class AddSalesOrder(models.Model):
     def _onchange_is_factoring(self):
         self.is_factoring = self.partner_id.is_factoring
 
+    def _prepare_invoice(self):
+        invoice_val = super(AddSalesOrder,self)._prepare_invoice()
+        invoice_val["is_factoring"]=self.is_factoring
+        print("Invoice val",invoice_val)
+        return invoice_val
 
 class AddAccountMove(models.Model):
     _inherit = "account.move"
 
     is_factoring = fields.Boolean(
-        string='is_factoring', store=True, default=lambda self: self.env['sale.advance.payment.inv'].search(['is_factoring_temp']).exists())
+        string='is_factoring', store=True)
 
-    # @api.depends('invoice_user_id', 'partner_id')
-    # def _onchange_is_factoring(self):
-    #     print("_onchange_is_factoring")
-    #     if tem.temp.t1 != 2:
-    #         for rec in self:
-    #             rec.is_factoring = tem.temp.t1
-    #             return self
-    #     tem.temp.t1 = 2
-    #     print(tem.temp.t1)
-
-    @api.onchange('partner_id', 'invoice_user_id')
-    def _onchange_is_factoring(self):
-        print("onchange called")
-        self.is_factoring = self.partner_id.is_factoring
-
-    # # def getdata(self):
-    # #     fetchdata = self.env[sale.order].search([])
-
-    # def default_get(self, fields):
-    #     res = super(AddAccountMove, self).default_get(fields)
-    #     res.update({
-    #         'is_factoring': self.env['sale.advance.payment.inv'].is_factoring_temp
-    #     })
-
-    #     return res
-
+   
 
 class bankaccountisfectoring(models.Model):
     _inherit = "res.partner.bank"

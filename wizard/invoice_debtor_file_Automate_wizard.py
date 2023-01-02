@@ -1,7 +1,6 @@
 import json
 from odoo import models
 from odoo import models, fields, api
-import xlsxwriter
 
 
 class debtor(models.TransientModel):
