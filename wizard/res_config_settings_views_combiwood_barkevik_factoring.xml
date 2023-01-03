@@ -7,17 +7,13 @@
             <field name="inherit_id" ref="account.res_config_settings_view_form" />
             <field name="arch" type="xml">
                 <xpath expr="//div[@id='use_invoice_terms']" position="inside" attrs="{'invisible':[('is_factoring','!=',True)]}">
-                    <field name="is_factoring" invisible='1'></field>
+                    <field name="is_factoring" invisible="1"></field>
                     <p attrs="{'invisible':[('is_factoring', '!=', True)]}">
                         <br />
                         <div class="o_setting_right_pane">
                             <b>Assignment Clause</b>
-                            <p>Fordringer etter 
-                            nærværende faktura er overdratt DNB  
-                            Bank ASA, Postboks 1600 Sentrum, 0021 Oslo, til eiendom.
-                            Befriende betaling kan kun skje til DNB Bank ASA. 
-                            Bankkonto 7032.05.16038. Ved betaling vennligst oppgi KID- 
-                            referanse eller fakturanummer og leverandør.
+                            <p>
+                                <field name="assignment_clause"></field>
                             </p>
                         </div>
                     </p>

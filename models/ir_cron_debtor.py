@@ -1,9 +1,7 @@
-import json
-from odoo import models
 from odoo import models, fields, api
 
 
-class debtor(models.TransientModel):
+class debtor(models.Model):
     _name = "debtor.info.automate"
     _description = "Debtor information send data at specific time"
     Transaction_code = fields.Char(size=1, help='1 for invoice', required=True)

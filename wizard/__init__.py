@@ -1,2 +1,1 @@
-from . import res_config_settings_wizard
-from . import invoice_debtor_file_Automate_wizard
+from . import res_config_settings
