@@ -17,6 +17,7 @@ class AddSalesOrder(models.Model):
             for rec in self.env['assignment.clause.value'].search([]):
                 is_factoring_display_text = rec.assignment_clause
             invoice_val["narration"] = is_factoring_display_text
-        # print("Invoice val", invoice_val)
+        # print(invoice_val["partner_id"])
+        print(self.env['res.partner.bank'].search(['partner_id','=',str(invoice_val["partner_id"]) ]))
 
         return invoice_val
