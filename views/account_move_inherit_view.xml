@@ -9,6 +9,10 @@
                 <xpath expr="//page[@name='other_info']//field[@name='to_check']" position="after">
                     <field name="is_factoring" />
                 </xpath>
+                <xpath expr="//field[@name='partner_bank_id']" position="attributes">
+                    <attribute name="force_save">True</attribute>
+                    <attribute name="readonly">False</attribute>
+                </xpath>
             </field>
         </record>
     </data>

@@ -1,7 +1,7 @@
 from odoo import models, fields, api
 
 
-class AddPartnerContact(models.Model):
+class ResPartner(models.Model):
     _inherit = "res.partner"
     is_factoring = fields.Boolean(
         string='Is Factoring',  help='the invoices to this customer will be default sold to the bank', default=0)
