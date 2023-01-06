@@ -9,7 +9,7 @@ class AccountPaymentRegister(models.TransientModel):
         # data set from account.move model method is  action_register_payment
         res = super(AccountPaymentRegister, self)._compute_partner_bank_id()
         for wizard in self:
-            if wizard.can_edit_wizard:
+            if wizard.partner_bank_id:
                 wizard.partner_bank_id = self._context.get(
                     'partner_payment_id')
         return res

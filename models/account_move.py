@@ -28,6 +28,7 @@ class AccountMove(models.Model):
     def _post(self, soft=True):
         # Method - adding payment_reference value accoding to sequence in account.account_move
         # define prefix and suffix and  luhn_checksum for accidental errors adding end of value
+
         def luhn_checksum(invoice_number):
             # Luhn checksum for add last digit in payment_reference
             def digits_of(n):
@@ -41,21 +42,25 @@ class AccountMove(models.Model):
                 checksum += sum(digits_of(d*2))
             return str(checksum % 10)
         res = super(AccountMove, self)._post(soft)
-        payment_reference_seq = self.env['ir.sequence'].search([
-            ('code', '=', 'account.account_move')
-        ])
-        pedding_value_undifined_lenth = (self.payment_reference).split('/')[2]
-        pedding_value_differnce = payment_reference_seq.padding - \
-            len(pedding_value_undifined_lenth)
-        if pedding_value_differnce < 0:
-            raise ValidationError(
-                _("In Sequence -> account.account_move -> Sequence Size is less then invoice id\nIncrement Sequence Size {0} or more then {0}".format(len(pedding_value_undifined_lenth))))
-        pedding_value = ('0'*pedding_value_differnce) + \
-            str(pedding_value_undifined_lenth)
-        after_payment_reference_value = payment_reference_seq.prefix + \
-            pedding_value+payment_reference_seq.suffix
-        self.payment_reference = after_payment_reference_value + \
-            luhn_checksum(after_payment_reference_value)
+        if type(self.payment_reference) == str and self.payment_reference not in 'INV/':
+            print("post called", self.payment_reference)
+            payment_reference_seq = self.env['ir.sequence'].search([
+                ('code', '=', 'account.account_move')
+            ])
+            pedding_value_undifined_lenth = (
+                self.payment_reference).split('/')[2]
+            pedding_value_differnce = payment_reference_seq.padding - \
+                len(pedding_value_undifined_lenth)
+            if pedding_value_differnce < 0:
+                raise ValidationError(
+                    _("In Sequence -> account.account_move -> Sequence Size is less then invoice id\nIncrement Sequence Size {0} or more then {0}".format(len(pedding_value_undifined_lenth))))
+            pedding_value = ('0'*pedding_value_differnce) + \
+                str(pedding_value_undifined_lenth)
+            after_payment_reference_value = payment_reference_seq.prefix + \
+                pedding_value+payment_reference_seq.suffix
+            self.payment_reference = after_payment_reference_value + \
+                luhn_checksum(after_payment_reference_value)
+
         return res
 
     def button_draft(self):
@@ -64,3 +69,7 @@ class AccountMove(models.Model):
         for move in self:
             move.payment_reference = ''
         return res
+
+    @api.onchange('partner_bank_id')
+    def _onchange_partner_id(self):
+        print(self.partner_bank_id)
