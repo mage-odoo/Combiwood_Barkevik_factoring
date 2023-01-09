@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 
 class AccountMove(models.Model):
@@ -25,7 +25,7 @@ class AccountMove(models.Model):
                 break
         return res
 
-    def _post(self, soft=True):
+    def action_post(self, soft=True):
         # Method - adding payment_reference value accoding to sequence in account.account_move
         # define prefix and suffix and  luhn_checksum for accidental errors adding end of value
 
@@ -41,8 +41,27 @@ class AccountMove(models.Model):
             for d in even_digits:
                 checksum += sum(digits_of(d*2))
             return str(checksum % 10)
-        res = super(AccountMove, self)._post(soft)
-        if type(self.payment_reference) == str and self.payment_reference not in 'INV/':
+        res = super(AccountMove, self).action_post()
+        # print("post called", self._context)
+        # print( == 'INV')
+        if self.name == False:
+            return res
+        elif type(self.payment_reference) == bool or (self.name).split("/")[0] == 'RINV':
+            print(self.env['account.move'].search(
+                [('payment_reference', '=', self.payment_reference)]))
+            if self.payment_reference == False:
+                raise UserError(
+                    "Payment Reference cant null!\nenter a value of referance")
+            else:
+                for rec in (self.env['account.move'].search([('payment_reference', '=', self.payment_reference)])):
+                    print(rec.payment_reference)
+                    if rec.payment_reference == self.payment_reference and rec.name != self.name:
+                        return res
+                else:
+                    raise UserError(
+                        "Payment Reference not exist!\nenter right value for referance")
+
+        elif (self.payment_reference).split("/")[0] == 'INV':
             print("post called", self.payment_reference)
             payment_reference_seq = self.env['ir.sequence'].search([
                 ('code', '=', 'account.account_move')
@@ -63,12 +82,12 @@ class AccountMove(models.Model):
 
         return res
 
-    def button_draft(self):
-        # This function remove payment_reference field data
-        res = super(AccountMove, self).button_draft()
-        for move in self:
-            move.payment_reference = ''
-        return res
+    # def button_draft(self):
+    #     # This function remove payment_reference field data
+    #     res = super(AccountMove, self).button_draft()
+    #     for move in self:
+    #         move.payment_reference = ''
+    #     return res
 
     @api.onchange('partner_bank_id')
     def _onchange_partner_id(self):

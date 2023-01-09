@@ -4,6 +4,7 @@ from odoo import models, fields, api
 class assignment_clause_value(models.Model):
     # Model for save just assignemt_clause_id single(one) value
     _name = 'assignment.clause.value'
+    _description = "Model for save just assignemt_clause_id single(one) value"
     assignment_clause = fields.Html(
         string="Assignment Clause", default="test data")
 
@@ -37,9 +38,16 @@ class ResConfigSettings(models.TransientModel):
         for rec in self:
             if rec.assignment_clause:
                 for val_of_assignment_clause in self.env['assignment.clause.value'].search([]):
+                    print("onsert value for")
                     if hash(rec.assignment_clause) != hash(val_of_assignment_clause.assignment_clause):
+                        print("onsert value if")
                         self.env['assignment.clause.value'].search([]).unlink()
                         print(rec.assignment_clause)
                         self.env['assignment.clause.value'].create({'id': '1',
                                                                     'assignment_clause': rec.assignment_clause})
+                else:
+                    self.env['assignment.clause.value'].create({'id': '1',
+                                                                'assignment_clause': rec.assignment_clause})
+        for i in self.env['assignment.clause.value'].search([]):
+            print(i.assignment_clause)
         return res

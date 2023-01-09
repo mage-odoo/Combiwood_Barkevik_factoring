@@ -9,8 +9,7 @@
     'depends': ['base', 'account', 'sale'],
     'data': [
         'security/ir.model.access.csv',
-        'data/invoice_file.xml',
-        'data/debtor_file.xml',
+        'data/invoice_and_debtor_file.xml',
         'data/account_move_sequence.xml',
         'views/res_config_settings_views.xml',
         'views/res_partner_inherit_view.xml',

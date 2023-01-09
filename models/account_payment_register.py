@@ -9,9 +9,8 @@ class AccountPaymentRegister(models.TransientModel):
         # data set from account.move model method is  action_register_payment
         res = super(AccountPaymentRegister, self)._compute_partner_bank_id()
         for wizard in self:
-            if wizard.partner_bank_id:
-                wizard.partner_bank_id = self._context.get(
-                    'partner_payment_id')
+            wizard.partner_bank_id = self.env['res.partner.bank'].search(
+                [('id', '=', self._context.get('partner_payment_id'))])
         return res
 
     # def default_get(self, fields_list):
