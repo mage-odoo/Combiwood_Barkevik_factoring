@@ -29,28 +29,21 @@ class InvoiceAndDebtor(models.Model):
                 if i.name[0:4] != 'PBNK':
                     a = "Invoice " if i.name[0:4] == 'INV/' else "Credit note "
                     f.write(str(1 if i.name[0:4] == 'INV/' else 9))
-
                     payment_reference = (
                         '0' * (4-int(len(str(i.payment_reference))))) + str(i.payment_reference)
                     f.write(payment_reference[:4])
-
                     customer_id = (
                         '0' * (9-int(len(str(i.partner_id.id)))))+str(i.partner_id.id)
                     f.write(customer_id)
-
                     credit_note_number = str(i.name).split("/")[2]
                     final_credit_note_number = (
                         ('0' * (8-int(len(str(credit_note_number))))))+str(credit_note_number)
                     f.write(final_credit_note_number)
-
                     f.write((i.invoice_date).strftime("%y%m%d"))
-
                     f.write((i.invoice_date_due).strftime("%y%m%d"))
-
                     Amount_total_signed = (
                         '0' * (11-int(len(str(abs(i.amount_total_signed)))))) + str(abs(i.amount_total_signed))
                     f.write(Amount_total_signed)
-
                     creation_date = (i.create_date).date()
                     last_discount_date = (i.create_date).date() + \
                         timedelta(days=10)
@@ -66,11 +59,9 @@ class InvoiceAndDebtor(models.Model):
                                         ".", ""))
                                 if int(finalvalue):
                                     f.write(finalvalue)
-
                     for rec in self.env['res.currency'].search([('active', '=', '1')]):
                         if finalvalue == "" or int(finalvalue) == 0:
                             f.write("     ")
-
                     f.write(" "*8)
                     f.write(" "*15)
                     f.write(" "*25)
@@ -94,14 +85,19 @@ class InvoiceAndDebtor(models.Model):
                 f.write("1195")
 
                 if len(str(rec.ref)) <= 9:
-                    if rec.ref == 9:
+                    if type(rec.ref) == bool:
+                        f.write(" "*9)
+                    elif rec.ref == 9:
                         f.write(str(rec.ref))
                     else:
                         f.write(((' ' * (9-int(len(str(rec.ref))))))+str(rec.ref))
                 else:
                     f.write(str(rec.ref)[:9])
+
                 if len(str(rec.l10n_no_bronnoysund_number)) <= 11:
-                    if rec.l10n_no_bronnoysund_number == 11:
+                    if type(rec.l10n_no_bronnoysund_number) == bool:
+                        f.write(" "*11)
+                    elif rec.l10n_no_bronnoysund_number == 11:
                         f.write(str(rec.l10n_no_bronnoysund_number))
                     else:
                         f.write(str(rec.l10n_no_bronnoysund_number)+((' ' *
@@ -110,7 +106,9 @@ class InvoiceAndDebtor(models.Model):
                     f.write(str(rec.l10n_no_bronnoysund_number)[:11])
 
                 if len(str(rec.name)) <= 35:
-                    if rec.name == 35:
+                    if type(rec.name) == bool:
+                        f.write(" "*35)
+                    elif rec.name == 35:
                         f.write(str(rec.name))
                     else:
                         f.write(str(rec.name) +
@@ -121,7 +119,9 @@ class InvoiceAndDebtor(models.Model):
                 f.write(" "*20)
 
                 if len(str(rec.street)) <= 30:
-                    if rec.street == 30:
+                    if type(rec.street) == bool:
+                        f.write(" "*30)
+                    elif rec.street == 30:
                         f.write(str(rec.street))
                     else:
                         f.write(str(rec.street) +
@@ -130,16 +130,23 @@ class InvoiceAndDebtor(models.Model):
                     f.write(str(rec.street)[:30])
 
                 if len(str(rec.zip)) <= 4:
-                    if rec.zip == 4:
+                    if type(rec.zip) == bool:
+                        f.write(" "*4)
+                    elif rec.zip == 4:
                         f.write(str(rec.zip))
                     else:
                         f.write(str(rec.zip) +
                                 ((' ' * (4-int(len(str(rec.zip)))))))
                 else:
-                    f.write(str(rec.zip)[:4])
+                    if type(rec.zip) == bool:
+                        f.write(" "*4)
+                    else:
+                        f.write(str(rec.zip)[:4])
 
                 if len(str(rec.city)) <= 23:
-                    if rec.city == 23:
+                    if type(rec.city) == bool:
+                        f.write(" "*23)
+                    elif rec.city == 23:
                         f.write(str(rec.city))
                     else:
                         f.write(str(rec.city) +

@@ -42,32 +42,28 @@ class AccountMove(models.Model):
                 checksum += sum(digits_of(d*2))
             return str(checksum % 10)
         res = super(AccountMove, self).action_post()
-        # print("post called", self._context)
-        # print( == 'INV')
         if self.name == False:
             return res
-        elif type(self.payment_reference) == bool or (self.name).split("/")[0] == 'RINV':
-            print(self.env['account.move'].search(
-                [('payment_reference', '=', self.payment_reference)]))
+        elif (self.name).split("/")[0] == 'RINV':
             if self.payment_reference == False:
                 raise UserError(
                     "Payment Reference cant null!\nenter a value of referance")
+                return res
             else:
                 for rec in (self.env['account.move'].search([('payment_reference', '=', self.payment_reference)])):
-                    print(rec.payment_reference)
                     if rec.payment_reference == self.payment_reference and rec.name != self.name:
                         return res
                 else:
                     raise UserError(
                         "Payment Reference not exist!\nenter right value for referance")
+                    return res
 
-        elif (self.payment_reference).split("/")[0] == 'INV':
-            print("post called", self.payment_reference)
+        elif (self.name).split("/")[0] == 'INV':
             payment_reference_seq = self.env['ir.sequence'].search([
                 ('code', '=', 'account.account_move')
             ])
             pedding_value_undifined_lenth = (
-                self.payment_reference).split('/')[2]
+                self.name).split('/')[2]
             pedding_value_differnce = payment_reference_seq.padding - \
                 len(pedding_value_undifined_lenth)
             if pedding_value_differnce < 0:
@@ -82,13 +78,26 @@ class AccountMove(models.Model):
 
         return res
 
+    @api.onchange('payment_referance')
+    def _onchange_payment_referance(self):
+        if type(self.payment_reference) == bool or (self.name).split("/")[0] == 'RINV':
+            if self.payment_reference == False:
+                raise UserError(
+                    "Payment Reference cant null!\nenter a value of referance")
+                return 1
+            else:
+                for rec in (self.env['account.move'].search([('payment_reference', '=', self.payment_reference)])):
+                    if rec.payment_reference == self.payment_reference and rec.name != self.name:
+                        return rec.payment_reference
+                else:
+                    raise UserError(
+                        "Payment Reference not exist!\nenter right value for referance")
+                    return 1
+        else:
+            return 1
     # def button_draft(self):
     #     # This function remove payment_reference field data
     #     res = super(AccountMove, self).button_draft()
     #     for move in self:
     #         move.payment_reference = ''
     #     return res
-
-    @api.onchange('partner_bank_id')
-    def _onchange_partner_id(self):
-        print(self.partner_bank_id)
