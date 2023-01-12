@@ -12,14 +12,3 @@ class AccountPaymentRegister(models.TransientModel):
             wizard.partner_bank_id = self.env['res.partner.bank'].search(
                 [('id', '=', self._context.get('partner_payment_id'))])
         return res
-
-    # def default_get(self, fields_list):
-    #     res = super(AccountPaymentRegister, self).default_get(fields_list)
-    #     # print(self._context.get('partner_payment_id'))
-    #     res['partner_payment_id'] = self._context.get('partner_payment_id')
-    #     print(res['partner_payment_id'])
-    #     # if self._context.get('active_model') == 'account.move':
-    #     #     lines = self.env['account.move'].browse(
-    #     #         self._context.get('partner_payment_id'))
-    #     #     print(lines)
-    #     return res

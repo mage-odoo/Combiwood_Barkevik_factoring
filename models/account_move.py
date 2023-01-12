@@ -9,7 +9,7 @@ class AccountMove(models.Model):
     is_factoring = fields.Boolean(
         string='Is Factoring', readonly=True)
     is_file_generated = fields.Boolean(
-        string="Data File", help="True = Generate data into faktura.sfg", default=True)
+        string="Data File", help="True = Generate data into faktura.sfg  \nFalse = don'twant Generate data into faktura.sfg")
 
     def _compute_commercial_partner_id(self):
         # res = sum(AccountMove, self)._compute_commercial_partner_id()
@@ -50,48 +50,30 @@ class AccountMove(models.Model):
     def run_cron_job(self):
         invoice_text = ''
         debtor_text = ''
-        for rec in self.env['account.move'].search([('move_type', '!=', 'entry'), ('state', '!=', 'draft'), ('is_file_generated', '=', 'True')]):
+        for rec in self.env['account.move'].search([('move_type', '!=', 'entry'), ('state', '!=', 'draft'), ('is_file_generated', '=', 'False')]):
             invoice_text += AccountMove.run_cron_for_invoice_file(rec)
-        print(invoice_text)
         for rec in self.env['res.partner'].search([]):
             debtor_text += AccountMove.run_cron_for_debtor_file(rec)
-        row = {'row': debtor_text}
-        print(row)
+        # File Generate code
+        folder_id = self.env.ref(
+            'Combiwood_Barkevik_factoring.documents_internal_folder').id
+        row = {'row': invoice_text}
+        time = str(fields.date.today())
         datas, dummy = self.env["ir.actions.report"]._render_qweb_text(
-            'Combiwood_Barkevik_factoring.action_report_deptor', self, row)
-
-        # print(ord(debtor_text))
-        # AccountMove.test_documents_from_web(self)
-        # pdf = invoice_text.sudo().render_qweb_pdf()[0]
-        # self.env['ir.attachment'].create({
-        #     'name': 'invoice.txt',
-        #     'type': 'binary',
-        #     'datas': base64.b64encode(invoice_text),
-        #     'mimetype': 'text/csv',
-        #     'datas_fname': self.number + ".pdf"
-        # })
-        print(self.env.ref('Combiwood_Barkevik_factoring.documents_internal_folder'))
+            'Combiwood_Barkevik_factoring.action_report_invoice_file', self, row)
         document_gif = self.env['documents.document'].create({
             'datas': base64.b64encode(datas),
-            'name': 'file2.txt',
-            'folder_id': self.env.ref('Combiwood_Barkevik_factoring.documents_internal_folder').id,
+            'name':  time+'_faktura.sgf',
+            'folder_id': folder_id,
         })
-
-    # def test_documents_from_web(self):
-    #     # self.authenticate('admin', 'admin')
-    #     self.folder_a = self.env['documents.folder'].create({
-    #         'name': 'folder A',
-    #     })
-    #     raw_gif = b"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs="
-    #     document_gif = self.env['documents.document'].create({
-    #         'raw': raw_gif,
-    #         'name': 'file.gif',
-    #         'mimetype': 'image/gif',
-    #         'folder_id': self.folder_a.id,
-    #     })
-    #     response = self.url_open('/web/image/')
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(response.content, raw_gif)
+        row = {'row': debtor_text}
+        datas, dumxxmy = self.env["ir.actions.report"]._render_qweb_text(
+            'Combiwood_Barkevik_factoring.action_report_deptor_file', self, row)
+        document_gif = self.env['documents.document'].create({
+            'datas': base64.b64encode(datas),
+            'name': time+'_kunde.sgf',
+            'folder_id': folder_id,
+        })
 
     def run_cron_for_invoice_file(rec):
         text = ""
@@ -101,9 +83,9 @@ class AccountMove(models.Model):
         F4 = ((((rec.name).split("/")[2])[:8]).zfill(8)
               if (rec.name) else ''.zfill(8))
         F5 = ((rec.invoice_date).strftime(
-            "%y%m%d") if not rec.invoice_date else "000000")
+            "%y%m%d") if rec.invoice_date else "000000")
         F6 = ((rec.invoice_date_due).strftime(
-            "%y%m%d") if not rec.invoice_date else "000000")
+            "%y%m%d") if rec.invoice_date else "000000")
         F7 = (str(abs(rec.amount_total_signed)).zfill(11))
         finalvalue = ''
         if rec.invoice_date:
@@ -129,13 +111,14 @@ class AccountMove(models.Model):
         k1 = ("k")
         k2 = ("9409")
         k3 = ("1195")
-        k4 = (str(rec.ref).ljust(9))
-        k5 = (str(rec.l10n_no_bronnoysund_number).ljust(11)[:11])
-        k6 = (str(rec.name).ljust(35))
+        k4 = (str(rec.ref).ljust(9) if rec.ref else " "*9)
+        k5 = (str(rec.l10n_no_bronnoysund_number).ljust(
+            11)[:11] if rec.ref else " "*11)
+        k6 = (str(rec.name).ljust(35) if rec.ref else " "*35)
         k7 = (str("N/A").ljust(20))
-        k8 = (str(rec.street).ljust(30))
-        k9 = ((str(rec.zip).ljust(4))[:4])
-        k10 = (str(rec.city).ljust(23))
+        k8 = (str(rec.street).ljust(30) if rec.ref else " "*30)
+        k9 = ((str(rec.zip).ljust(4))[:4] if rec.ref else " "*4)
+        k10 = (str(rec.city).ljust(23) if rec.ref else " "*23)
         k11 = (" "*20)
         k12 = (" "*12)
         k13 = ("Norge".ljust(20))
@@ -147,5 +130,3 @@ class AccountMove(models.Model):
         k19 = ("NOK")
         text += k1+k2+k3+k4+k5+k6+k7+k8+k9+k10+k11+k12+k13+k14+k15+k16+k17+k18+k19+"\n"
         return (text)
-
-# def

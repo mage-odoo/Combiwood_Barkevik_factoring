@@ -3,12 +3,16 @@ from odoo import models, fields, api
 
 class SalesOrder(models.Model):
     _inherit = "sale.order"
-    is_factoring = fields.Boolean(string='Is Factoring', tracking=True)
 
-    @api.onchange('partner_id')
-    def _onchange_is_factoring(self):
-        # Method - set value same as preset in res.partner
-        self.is_factoring = self.partner_id.is_factoring
+    is_factoring = fields.Boolean(
+        compute='_compute_is_factoring', tracking=True, readonly=False, store=True, string='is_factoring')
+
+    @api.depends('partner_id')
+    def _compute_is_factoring(self):
+        print(self.partner_id.is_factoring)
+        print(self.partner_id.commercial_partner_id.is_factoring)
+        if self.partner_id.is_factoring == True or self.partner_id.commercial_partner_id.is_factoring == True:
+            self.is_factoring = True
 
     def _prepare_invoice(self):
         # click 'Create Invoice' button set defult invoice_val value
