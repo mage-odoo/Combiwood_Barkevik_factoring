@@ -31,7 +31,6 @@ class AccountMove(models.Model):
         return res
 
     def _get_invoice_computed_reference(self):
-        print("compute called")
         pedding_value_undifined_lenth = str((self.name).split('/')[2])
         val = '91195'+pedding_value_undifined_lenth.zfill(8)+'00'
         return val + str(AccountMove.luhn_checksum(val))
