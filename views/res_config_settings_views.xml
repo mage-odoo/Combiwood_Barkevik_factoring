@@ -6,25 +6,22 @@
             <field name="model">res.config.settings</field>
             <field name="inherit_id" ref="account.res_config_settings_view_form" />
             <field name="arch" type="xml">
-                <xpath expr="//div[@id='use_invoice_terms']" position="inside" attrs="{'invisible':[('is_factoring','!=',True)]}">
-                    <field name="is_factoring" invisible="1"></field>
-                    <p attrs="{'invisible':[('is_factoring', '!=', True)]}">
-                        <br />
-                        <div class="o_setting_right_pane">
-                            <b>Assignment Clause</b>
-                            <p>
-                                <field name="assignment_clause"></field>
+                <xpath expr="//div[@id='use_invoice_terms']" position="inside">
 
-                            </p>
-                        </div>
-                        <div class="o_setting_right_pane">
-                            <b>Partner Name</b>
-                            <p>
-                                <field name="partner_account_id" domain="[('factoring_partner','=','True')]"></field>
-                            </p>
-                        </div>
+                    <br />
+                    <div class="o_setting_right_pane">
+                        <b>Assignment Clause</b>
+                        <p>
+                            <field name="assignment_clause"></field>
 
-                    </p>
+                        </p>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <b>Partner Name</b>
+                        <p>
+                            <field name="partner_id" domain="[('factoring_partner','=','True')]"></field>
+                        </p>
+                    </div>
                 </xpath>
             </field>
         </record>

@@ -1,3 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 Combiwood_Barkevik_factoring.access_assignment_clause_value,access_assignment_clause_value,Combiwood_Barkevik_factoring.model_assignment_clause_value,base.group_user,1,1,1,1
-Combiwood_Barkevik_factoring.access_invoice_and_debtor,access_invoice_and_debtor,Combiwood_Barkevik_factoring.model_invoice_and_debtor,base.group_user,1,1,1,1

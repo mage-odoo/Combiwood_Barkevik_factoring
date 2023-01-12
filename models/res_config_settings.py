@@ -1,22 +1,17 @@
 from odoo import models, fields, api
 
 
-class assignment_clause_value(models.Model):
-    # Model for save just assignemt_clause_id single(one) value
-    _name = 'assignment.clause.value'
-    _description = "Model for save just assignemt_clause_id single(one) value"
-    assignment_clause = fields.Html(
-        string="Assignment Clause", default="test data")
-    partner_account_id = fields.Integer()
-
-
 class ResConfigSettings(models.TransientModel):
     _inherit = "res.config.settings"
-    is_factoring = fields.Boolean(string='Is Factoring', default=lambda self:self.env.user.is_factoring)
-    res_company_id = fields.Many2one(
-        'res.company', default=lambda self:self.env.user.company_id.id)
     assignment_clause = fields.Html(
-        string="Assignment Clause",related='res_company_id.assignment_clause',store=True,readonly=False)
-    partner_account_id = fields.Many2one(
-        'res.partner', string='partner_account_id',related='res_company_id.partner_account_id',store=True,readonly=False)
-    
+        string="Assignment Clause", related='company_id.assignment_clause', readonly=False)
+    partner_id = fields.Many2one(
+        'res.partner', string='partner_account_id', related='company_id.partner_id', readonly=False)
+
+    # @api.onchange('partner_account_id')
+    # def _onchange_res_company_id(self):
+    #     print(self.env.user.company_id.partner_account_id)
+    #     print(self.env.user.company_id.assignment_clause)
+    #     Query = "select * from res_company"
+    #     self.env.cr.execute(Query)
+    #     print(self.env.cr.fetchall())

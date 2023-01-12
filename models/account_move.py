@@ -1,6 +1,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
 from datetime import timedelta
+import base64
 
 
 class AccountMove(models.Model):
@@ -10,14 +11,12 @@ class AccountMove(models.Model):
     is_file_generated = fields.Boolean(
         string="Data File", help="True = Generate data into faktura.sfg", default=True)
 
-    @api.depends('partner_id')
     def _compute_commercial_partner_id(self):
-        partner_account_id = 0
-        for rec in self.env['assignment.clause.value'].search([]):
-            assignemt_value = rec.assignment_clause
-            partner_account_id = rec.partner_account_id
+        # res = sum(AccountMove, self)._compute_commercial_partner_id()
         for move in self:
-            move.commercial_partner_id = partner_account_id
+            if move.company_id.partner_id:
+                move.commercial_partner_id = move.company_id.partner_id
+        # return res
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
@@ -49,66 +48,104 @@ class AccountMove(models.Model):
         return str(checksum % 10)
 
     def run_cron_job(self):
-        AccountMove.run_cron_for_invoice_file(self)
-        AccountMove.run_cron_for_debtor_file(self)
+        invoice_text = ''
+        debtor_text = ''
+        for rec in self.env['account.move'].search([('move_type', '!=', 'entry'), ('state', '!=', 'draft'), ('is_file_generated', '=', 'True')]):
+            invoice_text += AccountMove.run_cron_for_invoice_file(rec)
+        print(invoice_text)
+        for rec in self.env['res.partner'].search([]):
+            debtor_text += AccountMove.run_cron_for_debtor_file(rec)
+        row = {'row': debtor_text}
+        print(row)
+        datas, dummy = self.env["ir.actions.report"]._render_qweb_text(
+            'Combiwood_Barkevik_factoring.action_report_deptor', self, row)
 
-    def run_cron_for_invoice_file(self):
-        open("faktura.sgf", "w").close()
-        f = open("faktura.sgf", "a", encoding="utf-16")
-        for rec in self.env['account.move'].search([('is_file_generated', '=', 'True'), ('move_type', '!=', 'entry')]):
-            f.write(str(1 if rec.move_type == 'out_invoice' else 9))
-            f.write('1195')
-            f.write(str(rec.partner_id.id).zfill(9))
-            f.write(((rec.name).split("/")[2]).zfill(8))
-            f.write((rec.invoice_date).strftime("%y%m%d"))
-            f.write((rec.invoice_date_due).strftime("%y%m%d"))
-            f.write(str(abs(rec.amount_total_signed)).zfill(11))
-            print(rec.invoice_payment_term_id.line_ids.discount_days)
+        # print(ord(debtor_text))
+        # AccountMove.test_documents_from_web(self)
+        # pdf = invoice_text.sudo().render_qweb_pdf()[0]
+        # self.env['ir.attachment'].create({
+        #     'name': 'invoice.txt',
+        #     'type': 'binary',
+        #     'datas': base64.b64encode(invoice_text),
+        #     'mimetype': 'text/csv',
+        #     'datas_fname': self.number + ".pdf"
+        # })
+        print(self.env.ref('Combiwood_Barkevik_factoring.documents_internal_folder'))
+        document_gif = self.env['documents.document'].create({
+            'datas': base64.b64encode(datas),
+            'name': 'file2.txt',
+            'folder_id': self.env.ref('Combiwood_Barkevik_factoring.documents_internal_folder').id,
+        })
+
+    # def test_documents_from_web(self):
+    #     # self.authenticate('admin', 'admin')
+    #     self.folder_a = self.env['documents.folder'].create({
+    #         'name': 'folder A',
+    #     })
+    #     raw_gif = b"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs="
+    #     document_gif = self.env['documents.document'].create({
+    #         'raw': raw_gif,
+    #         'name': 'file.gif',
+    #         'mimetype': 'image/gif',
+    #         'folder_id': self.folder_a.id,
+    #     })
+    #     response = self.url_open('/web/image/')
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(response.content, raw_gif)
+
+    def run_cron_for_invoice_file(rec):
+        text = ""
+        F1 = (str(1 if rec.move_type == 'out_invoice' else 9))
+        F2 = ('1195')
+        F3 = (str(rec.partner_id.id).zfill(9))
+        F4 = ((((rec.name).split("/")[2])[:8]).zfill(8)
+              if (rec.name) else ''.zfill(8))
+        F5 = ((rec.invoice_date).strftime(
+            "%y%m%d") if not rec.invoice_date else "000000")
+        F6 = ((rec.invoice_date_due).strftime(
+            "%y%m%d") if not rec.invoice_date else "000000")
+        F7 = (str(abs(rec.amount_total_signed)).zfill(11))
+        finalvalue = ''
+        if rec.invoice_date:
             last_discount_date = (rec.create_date).date() + \
                 timedelta(days=10)
-            finalvalue = ''
             if (rec.invoice_date) <= last_discount_date:
                 finalvalue = "0"+str(rec.invoice_payment_term_id.line_ids.discount_days) + \
                                     (str(rec.invoice_payment_term_id.line_ids.discount_percentage).replace(
                                         ".", ""))
-                print(rec.invoice_payment_term_id.line_ids.discount_days)
-            f.write(finalvalue.zfill(5))
-            f.write(" "*8)
-            f.write(" "*15)
-            f.write(" "*25)
-            f.write(" "*4)
-            f.write(" "*7)
-            f.write((rec.name)[:3])
-            f.write(" "*11)
-            f.write("\n")
-        f.close()
-        with open("faktura.sgf", "r", encoding="utf-16") as myfile:
-            print(myfile.read())
+        F8 = (finalvalue.zfill(5))
+        F9 = (" "*8)
+        F10 = (" "*15)
+        F11 = (" "*25)
+        F12 = (" "*4)
+        F13 = (" "*7)
+        F14 = ((rec.name)[:3] if (rec.name) else ''.zfill(3))
+        F15 = (" "*11)
+        text += F1+F2+F3+F4+F5+F6+F7+F8+F9+F10+F11+F12+F13+F14+F15+"\n"
+        return text
 
-    def run_cron_for_debtor_file(self):
-        open("kunde.sgf", "w").close()
-        f = open("kunde.sgf", "a", encoding="utf-16")
-        for rec in self.env['res.partner'].search([]):
-            f.write("k")
-            f.write("9409")
-            f.write("1195")
-            f.write(str(rec.ref).ljust(9))
-            f.write(str(rec.l10n_no_bronnoysund_number).ljust(11)[:11])
-            f.write(str(rec.name).ljust(35))
-            f.write(str("N/A").ljust(20))
-            f.write(str(rec.street).ljust(30))
-            f.write((str(rec.zip).ljust(4))[:4])
-            f.write(str(rec.city).ljust(23))
-            f.write(" "*20)
-            f.write(" "*12)
-            f.write("Norge".ljust(20))
-            f.write("NO")
-            f.write("578")
-            f.write(" "*11)
-            f.write(" "*4)
-            f.write(" "*35)
-            f.write("NOK")
-            f.write("\n")
-        f.close()
-        with open("kunde.sgf", "r", encoding="utf-16") as myfile:
-            print(myfile.read())
+    def run_cron_for_debtor_file(rec):
+        text = ""
+        k1 = ("k")
+        k2 = ("9409")
+        k3 = ("1195")
+        k4 = (str(rec.ref).ljust(9))
+        k5 = (str(rec.l10n_no_bronnoysund_number).ljust(11)[:11])
+        k6 = (str(rec.name).ljust(35))
+        k7 = (str("N/A").ljust(20))
+        k8 = (str(rec.street).ljust(30))
+        k9 = ((str(rec.zip).ljust(4))[:4])
+        k10 = (str(rec.city).ljust(23))
+        k11 = (" "*20)
+        k12 = (" "*12)
+        k13 = ("Norge".ljust(20))
+        k14 = ("NO")
+        k15 = ("578")
+        k16 = (" "*11)
+        k17 = (" "*4)
+        k18 = (" "*35)
+        k19 = ("NOK")
+        text += k1+k2+k3+k4+k5+k6+k7+k8+k9+k10+k11+k12+k13+k14+k15+k16+k17+k18+k19+"\n"
+        return (text)
+
+# def

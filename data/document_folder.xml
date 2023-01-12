@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="documents_internal_folder" model="documents.folder" forcecreate="0">
+        <field name="name">Invoice Deptor Files</field>
+        <field name="description" type="html">
+            <center>
+                <p>Invoice Deptor Files</p>
+                <p>Invoice Deptor Files</p>
+            </center>
+        </field>
+    </record>
+</odoo>
