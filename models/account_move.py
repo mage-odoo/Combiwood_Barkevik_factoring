@@ -111,8 +111,8 @@ class AccountMove(models.Model):
         text = ""
         F1 = (str(1 if rec.move_type == 'out_invoice' else 9))
         F2 = ('1195')
-        fieldF3 = rec.invoice_user_id.ref or rec.ref
-        F3 = (fieldF3[:9]).zfill(9) if fieldF3 and fieldF3 != '' else "0"*9
+        fieldF3 = rec.partner_id.parent_id.ref or rec.partner_id.ref or True
+        F3 = (fieldF3[:9]).zfill(9) if not fieldF3 else "0"*9
         F4 = ((((rec.name).split("/")[2])[:8]).zfill(8)
               if (rec.name) else ''.zfill(8))
         F5 = ((rec.invoice_date).strftime(
@@ -141,8 +141,9 @@ class AccountMove(models.Model):
         k1 = ("k")
         k2 = ("9409")
         k3 = ("1195")
-        fieldK4 = rec.invoice_user_id.ref or rec.ref
-        k4 = (fieldK4[:9]) if (fieldK4 and fieldK4 != '') else " "*9
+        fieldK4 = rec.partner_id.parent_id.ref or rec.partner_id.ref or True
+        print(rec.invoice_user_id.ref)
+        k4 = (fieldK4[:9]).ljust(9) if not fieldK4 else " "*9
         k5 = (str(rec.partner_id.l10n_no_bronnoysund_number).ljust(
             11)[:11] if rec.partner_id.l10n_no_bronnoysund_number else " "*11)
         k6 = (str(rec.partner_id.name)[:35].ljust(
