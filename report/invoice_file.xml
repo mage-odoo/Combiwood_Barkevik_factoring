@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="invoice_template" name="debtor_template">
-        <t t-out="row" />
-    </template>
+    <template id="invoice_template" name="debtor_template"><t t-out="row" /></template>
     <record id="action_report_invoice_file" model="ir.actions.report">
         <field name="name">Name</field>
         <field name="model">account.move</field>

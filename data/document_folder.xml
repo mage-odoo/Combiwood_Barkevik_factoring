@@ -4,8 +4,8 @@
         <field name="name">Invoice Deptor Files</field>
         <field name="description" type="html">
             <center>
-                <p>Invoice Deptor Files</p>
-                <p>Invoice Deptor Files</p>
+                <p>Invoice And Deptor Files</p>
+                <p>Invoice And Deptor Files</p>
             </center>
         </field>
     </record>
