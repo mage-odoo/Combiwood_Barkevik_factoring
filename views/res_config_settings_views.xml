@@ -2,12 +2,11 @@
 <odoo>
     <data>
         <record id="res_config_settings_view_form" model="ir.ui.view">
-            <field name="name">res.config.settings.view.form.inherit.accounting</field>
+            <field name="name">res.config.settings.view.form.inherit.factoring</field>
             <field name="model">res.config.settings</field>
             <field name="inherit_id" ref="account.res_config_settings_view_form" />
             <field name="arch" type="xml">
                 <xpath expr="//div[@id='use_invoice_terms']" position="inside">
-
                     <br />
                     <div class="o_setting_right_pane">
                         <b>Assignment Clause</b>
@@ -18,14 +17,11 @@
                     <div class="o_setting_right_pane">
                         <b>Partner Name</b>
                         <p>
-                            <field name="partner_id" domain="[('factoring_partner','=','True')]"></field>
+                            <field name="factoring_partner_id" domain="[('is_factoring_partner','=','True')]"></field>
                         </p>
                     </div>
                 </xpath>
             </field>
         </record>
-
     </data>
-
-
 </odoo>

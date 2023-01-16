@@ -2,12 +2,11 @@
 <!-- Invoice & Debtor file report action calling from account move model -->
 <odoo>
     <data>
-        <record id="ir_cron_invoice_file" model="ir.cron">
+        <record id="ir_cron_invoice_and_debtor_file" model="ir.cron">
             <field name="name">Invoice File And Debtor File</field>
-            <field name="type">ir.actions.server</field>
             <field name="model_id" ref="account.model_account_move" />
             <field name="state">code</field>
-            <field name="code">model.run_cron_job()</field>
+            <field name="code">model.cron_invoice_debtor()</field>
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>
             <field name="numbercall">-1</field>

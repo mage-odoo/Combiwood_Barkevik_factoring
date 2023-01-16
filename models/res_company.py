@@ -6,5 +6,5 @@ class ResCompany(models.Model):
 
     assignment_clause = fields.Html(
         string="Assignment Clause")
-    partner_id = fields.Many2one(
-        'res.partner', string='Partner Account Id', help="Factoring Partner")
+    factoring_partner_id = fields.Many2one(
+        'res.partner', string='Factoring Partner', help="Factoring Partner")

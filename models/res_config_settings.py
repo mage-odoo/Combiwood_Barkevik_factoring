@@ -6,5 +6,5 @@ class ResConfigSettings(models.TransientModel):
 
     assignment_clause = fields.Html(
         string="Assignment Clause", related='company_id.assignment_clause', readonly=False)
-    partner_id = fields.Many2one(
-        'res.partner', string='Partner Account Id', related='company_id.partner_id', readonly=False)
+    factoring_partner_id = fields.Many2one(
+        'res.partner', string='Factoring Partner', related='company_id.partner_id', readonly=False)
