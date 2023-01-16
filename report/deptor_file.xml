@@ -3,7 +3,7 @@
     <template id="debtor_template" name="debtor_template"><t t-out="row" /></template>
 
     <record id="action_report_deptor_file" model="ir.actions.report">
-        <field name="name">Name</field>
+        <field name="name">Debtor File Qweb Action</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-text</field>
         <field name="report_name">Combiwood_Barkevik_factoring.debtor_template</field>

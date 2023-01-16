@@ -1,9 +1,10 @@
-from odoo import models, fields, api
+from odoo import models, fields
 
 
 class ResCompany(models.Model):
     _inherit = 'res.company'
+
     assignment_clause = fields.Html(
-        string="Assignment Clause", default="test data")
+        string="Assignment Clause")
     partner_id = fields.Many2one(
-        'res.partner', string='partner_account_id', help="Factoring Partner")
+        'res.partner', string='Partner Account Id', help="Factoring Partner")

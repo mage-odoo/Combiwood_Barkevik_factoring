@@ -2,7 +2,7 @@
 <odoo>
     <template id="invoice_template" name="debtor_template"><t t-out="row" /></template>
     <record id="action_report_invoice_file" model="ir.actions.report">
-        <field name="name">Name</field>
+        <field name="name">Invoice File Qweb Action</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-text</field>
         <field name="report_name">Combiwood_Barkevik_factoring.invoice_template</field>

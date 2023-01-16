@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Aaddvalue into documents_folder model -->
 <odoo>
     <record id="documents_internal_folder" model="documents.folder" forcecreate="0">
         <field name="name">Invoice Deptor Files</field>
         <field name="description" type="html">
             <center>
-                <p>Invoice And Deptor Files</p>
-                <p>Invoice And Deptor Files</p>
+                <p>Invoice And Deptor Files recored use for Combiwood Barkevik Factoring</p>
             </center>
         </field>
     </record>
