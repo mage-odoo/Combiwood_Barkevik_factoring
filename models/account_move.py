@@ -73,77 +73,80 @@ class AccountMove(models.Model):
         val = '91195'+pedding_value_undifined_lenth.zfill(8)+'00'
         return val + str(self.luhn_checksum(val))
 
-    def run_cron_for_invoice_file(rec):
+    def run_cron_for_invoice_file(self):
         ''' cron for create invoice file'''
-        text = ""
-        F1 = (str(1 if rec.move_type == 'out_invoice' else 9))
-        F2 = ('1195')
-        fieldF3 = rec.partner_id.parent_id.ref or rec.partner_id.ref or True
-        F3 = (fieldF3[:9]).zfill(9) if type(fieldF3) != bool else "0"*9
-        F4 = ((((rec.name).split("/")[2])[:8]).zfill(8)
-              if (rec.name) else ''.zfill(8))
-        F5 = ((rec.invoice_date).strftime(
-            "%y%m%d") if type(rec.invoice_date) == datetime.date else "000000")
-        F6 = ((rec.invoice_date_due).strftime(
-            "%y%m%d") if type(rec.invoice_date_due) == datetime.date else "000000")
-        F7 = (str(rec.amount_total_signed).zfill(11))
-        final_discount_value = ''
-        if (rec.invoice_date and rec.invoice_date_due) and rec.invoice_date <= rec.invoice_date_due:
-            diff_days = (rec.invoice_date_due-rec.invoice_date).days
-            final_discount_value = str(diff_days).zfill(
-                3)+(str(rec.invoice_payment_term_id.line_ids.discount_percentage).replace(".", ""))
-        F8 = (final_discount_value.zfill(5)[:5])
-        F9 = (" "*8)
-        F10 = (" "*15)
-        F11 = (" "*25)
-        F12 = (" "*4)
-        F13 = (" "*7)
-        F14 = (''.ljust(3))
-        F15 = (" "*11)
-        text += F1+F2+F3+F4+F5+F6+F7+F8+F9+F10+F11+F12+F13+F14+F15+'\r\n'
-        return text
+        invoice_text = ''
+        for rec in self.search([('state', '=', 'posted'), ('generate_file', '=', True), ('is_factoring', '=', True)]):
+            if rec.move_type in ('out_refund', 'out_invoice'):
+                text = ""
+                F1 = (str(1 if rec.move_type == 'out_invoice' else 9))
+                F2 = ('1195')
+                fieldF3 = rec.partner_id.parent_id.ref or rec.partner_id.ref or True
+                F3 = (fieldF3[:9]).zfill(9) if type(fieldF3) != bool else "0"*9
+                F4 = ((((rec.name).split("/")[2])[:8]).zfill(8)
+                      if (rec.name) else ''.zfill(8))
+                F5 = ((rec.invoice_date).strftime(
+                    "%y%m%d") if type(rec.invoice_date) == datetime.date else "000000")
+                F6 = ((rec.invoice_date_due).strftime(
+                    "%y%m%d") if type(rec.invoice_date_due) == datetime.date else "000000")
+                F7 = (str(rec.amount_total_signed).zfill(11))
+                final_discount_value = ''
+                if (rec.invoice_date and rec.invoice_date_due) and rec.invoice_date <= rec.invoice_date_due:
+                    diff_days = (rec.invoice_date_due-rec.invoice_date).days
+                    final_discount_value = str(diff_days).zfill(
+                        3)+(str(rec.invoice_payment_term_id.line_ids.discount_percentage).replace(".", ""))
+                F8 = (final_discount_value.zfill(5)[:5])
+                F9 = (" "*8)
+                F10 = (" "*15)
+                F11 = (" "*25)
+                F12 = (" "*4)
+                F13 = (" "*7)
+                F14 = (''.ljust(3))
+                F15 = (" "*11)
+                text += F1+F2+F3+F4+F5+F6+F7+F8+F9+F10+F11+F12+F13+F14+F15+'\r\n'
+                invoice_text += text.replace('-', '0')
+        return invoice_text
 
-    def run_cron_for_debtor_file(rec):
+    def run_cron_for_debtor_file(self):
         ''' cron for create debtor file'''
-        text = ""
-        k1 = ("k")
-        k2 = ("9409")
-        k3 = ("1195")
-        fieldK4 = rec.partner_id.parent_id.ref or rec.partner_id.ref or True
-        k4 = (fieldK4[:9]).ljust(9) if not fieldK4 else " "*9
-        k5 = (str(rec.partner_id.l10n_no_bronnoysund_number).ljust(
-            11)[:11] if rec.partner_id.l10n_no_bronnoysund_number else " "*11)
-        k6 = (str(rec.partner_id.name)[:35].ljust(
-            35) if rec.partner_id.name else " "*35)
-        k7 = ("".ljust(20))
-        k8 = (str(rec.partner_id.street)[:30].ljust(
-            30) if rec.partner_id.street else " "*30)
-        k9 = ((str(rec.partner_id.zip)[:4].ljust(4))[
-              :4] if rec.partner_id.zip else " "*4)
-        k10 = (str(rec.partner_id.city)[:23].ljust(
-            23) if rec.partner_id.city else " "*23)
-        k11 = (" "*20)
-        k12 = (" "*12)
-        k13 = ("Norge".ljust(20))
-        k14 = ("NO")
-        k15 = ("578")
-        k16 = (" "*11)
-        k17 = (" "*4)
-        k18 = (" "*35)
-        k19 = ("NOK")
-        text += k1+k2+k3+k4+k5+k6+k7+k8+k9+k10+k11 + \
-            k12+k13+k14+k15+k16+k17+k18+k19+'\r\n'
-        return (text)
+        debtor_text = ''
+        for rec in self.search([('state', '=', 'posted'), ('generate_file', '=', True), ('is_factoring', '=', True)]):
+            if rec.move_type in ('out_refund', 'out_invoice'):
+                text = ""
+                k1 = ("k")
+                k2 = ("9409")
+                k3 = ("1195")
+                fieldK4 = rec.partner_id.parent_id.ref or rec.partner_id.ref or True
+                k4 = (fieldK4[:9]).ljust(9) if not fieldK4 else " "*9
+                k5 = (str(rec.partner_id.l10n_no_bronnoysund_number).ljust(
+                    11)[:11] if rec.partner_id.l10n_no_bronnoysund_number else " "*11)
+                k6 = (str(rec.partner_id.name)[:35].ljust(
+                    35) if rec.partner_id.name else " "*35)
+                k7 = ("".ljust(20))
+                k8 = (str(rec.partner_id.street)[:30].ljust(
+                    30) if rec.partner_id.street else " "*30)
+                k9 = ((str(rec.partner_id.zip)[:4].ljust(4))[
+                    :4] if rec.partner_id.zip else " "*4)
+                k10 = (str(rec.partner_id.city)[:23].ljust(
+                    23) if rec.partner_id.city else " "*23)
+                k11 = (" "*20)
+                k12 = (" "*12)
+                k13 = ("Norge".ljust(20))
+                k14 = ("NO")
+                k15 = ("578")
+                k16 = (" "*11)
+                k17 = (" "*4)
+                k18 = (" "*35)
+                k19 = ("NOK")
+                text += k1+k2+k3+k4+k5+k6+k7+k8+k9+k10+k11 + \
+                    k12+k13+k14+k15+k16+k17+k18+k19+'\r\n'
+                debtor_text += text
+        return debtor_text
 
     def run_cron_job(self):
         '''cron job for calling invoice and debtor cron job funaction and calling templete'''
-        invoice_text = ''
-        debtor_text = ''
-        for move in self.search([('state', '=', 'posted'), ('generate_file', '=', True), ('is_factoring', '=', True)]):
-            if move.move_type in ('out_refund', 'out_invoice'):
-                invoice_text += move.run_cron_for_invoice_file()
-                debtor_text += move.run_cron_for_debtor_file()
-
+        invoice_text = self.run_cron_for_invoice_file()
+        debtor_text = self.run_cron_for_debtor_file()
         # File Generate code
         folder_id = self.env.ref(
             'Combiwood_Barkevik_factoring.documents_internal_folder').id
