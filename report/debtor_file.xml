@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="debtor_template" name="debtor_template">
-        <t t-out="row" />
-    </template>
+    <template id="debtor_template" name="debtor_template"><t t-out="row" /></template>
 
     <record id="action_report_deptor_file" model="ir.actions.report">
         <field name="name">Debtor File Qweb Action</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-text</field>
-        <field name="report_name">Combiwood_Barkevik_factoring.debtor_template</field>
-        <field name="report_file">Combiwood_Barkevik_factoring.debtor_template</field>
+        <field name="report_name">combiwood_barkevik_factoring.debtor_template</field>
+        <field name="report_file">combiwood_barkevik_factoring.debtor_template</field>
         <field name="print_report_name">"Invoice And Debtor File"</field>
         <field name="binding_type">report</field>
     </record>

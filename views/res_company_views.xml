@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <odoo>
     <data>
-        <record id="view_company_form_inherit_Combiwood_Barkevik_factoring" model="ir.ui.view">
+        <record id="view_company_form_inherit_combiwood_barkevik_factoring" model="ir.ui.view">
             <field name="name">res.company.view.form.inherit.factoring</field>
             <field name="inherit_id" ref="base.view_company_form" />
             <field name="model">res.company</field>

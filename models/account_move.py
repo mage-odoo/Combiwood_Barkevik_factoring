@@ -88,7 +88,9 @@ class AccountMove(models.Model):
                 "%y%m%d") if type(rec.invoice_date) == datetime.date else "000000")
             F6 = ((rec.invoice_date_due).strftime(
                 "%y%m%d") if type(rec.invoice_date_due) == datetime.date else "000000")
-            F7 = (str(rec.amount_total_signed).zfill(11))
+            F7Value = ("{:.2f}".format(abs(
+                rec.amount_total_signed))).replace(".", "")
+            F7 = (F7Value.zfill(11))
             final_discount_value = ''
             if (rec.invoice_date and rec.invoice_date_due) and rec.invoice_date <= rec.invoice_date_due:
                 diff_days = (rec.invoice_date_due-rec.invoice_date).days
@@ -103,7 +105,7 @@ class AccountMove(models.Model):
             F14 = (''.ljust(3))
             F15 = (" "*11)
             text += F1+F2+F3+F4+F5+F6+F7+F8+F9+F10+F11+F12+F13+F14+F15+'\r\n'
-            invoice_text += text.replace('-', '0')
+            invoice_text += text
         return invoice_text
 
     def run_cron_for_debtor_file(self):
@@ -149,11 +151,11 @@ class AccountMove(models.Model):
         debtor_text = move_ids.run_cron_for_debtor_file()
         # File Generate code
         folder_id = self.env.ref(
-            'Combiwood_Barkevik_factoring.invoice_debtor_file_Combiwood_Barkevik_factoring').id
+            'combiwood_barkevik_factoring.invoice_debtor_file_combiwood_barkevik_factoring').id
         row = {'row': invoice_text}
         time = str(fields.date.today())
         datas, dummy = self.env["ir.actions.report"]._render_qweb_text(
-            'Combiwood_Barkevik_factoring.action_report_invoice_file', self, row)
+            'combiwood_barkevik_factoring.action_report_invoice_file', self, row)
         document_gif = self.env['documents.document'].create({
             'datas': base64.b64encode(datas),
             'name':  time+'_faktura.sgf',
@@ -161,7 +163,7 @@ class AccountMove(models.Model):
         })
         row = {'row': debtor_text}
         datas, dumxxmy = self.env["ir.actions.report"]._render_qweb_text(
-            'Combiwood_Barkevik_factoring.action_report_deptor_file', self, row)
+            'combiwood_barkevik_factoring.action_report_deptor_file', self, row)
         document_gif = self.env['documents.document'].create({
             'datas': base64.b64encode(datas),
             'name': f'kunde_{time}.sgf',
