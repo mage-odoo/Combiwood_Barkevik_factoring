@@ -18,8 +18,17 @@ class AccountMove(models.Model):
             rather prosess with partner that id goes to partner ledger'''
         result = super()._compute_commercial_partner_id()
         for move in self.filtered(lambda move_id: move_id.is_factoring):
-            move.commercial_partner_id = move.company_id.partner_id
+            move.commercial_partner_id = move.company_id.factoring_partner_id
         return result
+
+    @api.depends('commercial_partner_id')
+    def _compute_bank_partner_id(self):
+        '''Factoring true the display only that partner bank 
+        details'''
+        move = super()._compute_bank_partner_id()
+        for move in self.filtered(lambda move_id: move_id.is_factoring):
+            move.bank_partner_id = move.company_id.factoring_partner_id
+        return move
 
     @api.depends('partner_id')
     def _compute_is_factoring(self):
@@ -30,7 +39,7 @@ class AccountMove(models.Model):
 
     # @api.onchange('partner_id')
     # def _onchange_is_factoring(self):
-    #     print("onchangre called")
+    #     print(self.company_id.factoring_partner_id)
     #     '''selecting is_factoring true when partner id is_factoring true rather
     #     selecting that perent is_factoring true'''
     #     for move in self:
@@ -45,13 +54,20 @@ class AccountMove(models.Model):
             {'narration': self.company_id.assignment_clause})
         return move
 
-    @api.depends('partner_id')
-    def _compute_partner_bank_id(self):
-        '''select partner bank id from there banks where in that user bank select default bank where
-        is_factoring is true'''
-        move = super()._compute_partner_bank_id()
-        for user_bank in self.partner_id.bank_ids.filtered(lambda move_id: move_id.is_factoring):
-            self.partner_bank_id = user_bank.id
+    # @api.depends('partner_id')
+    # def _compute_partner_bank_id(self):
+    #     '''select partner bank id from there banks where in that user bank select default bank where
+    #     is_factoring is true'''
+    #     move = super()._compute_partner_bank_id()
+    #     print("called _compute_partner_bank_id")
+    #     for user_bank in self.partner_id.bank_ids.filtered(lambda move_id: move_id.is_factoring):
+    #         self.partner_bank_id = user_bank.id
+    #     return move
+
+    def action_register_payment(self):
+        '''Display partner bank id when click a button Register payment'''
+        move = super().action_register_payment()
+        move['context']['partner_payment_id'] = self.partner_bank_id.id
         return move
 
     def luhn_checksum(self, invoice_number):
