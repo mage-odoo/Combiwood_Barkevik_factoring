@@ -55,7 +55,7 @@ class AccountMove(models.Model):
         return move
 
     def luhn_checksum(self, invoice_number):
-        ''' Luhn checksum for add last digit in payment_reference'''
+        ''' Luhn testing checksum for Add last digit in payment_reference'''
         def digits_of(n):
             return [int(d) for d in str(n)]
         digits = digits_of(invoice_number)
